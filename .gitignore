@@ -1,0 +1,20 @@
+# Sistem dosyaları
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log
+
+# Geçici dosyalar
+*.log
+*.tmp
+
+# IDE / Editör
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Antigravity AI
+.claude/
