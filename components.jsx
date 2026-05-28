@@ -719,19 +719,36 @@ function RecentlyViewed({ t, lang, go }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="container recently-viewed-section" style={{ marginTop: 60, paddingTop: 40, borderTop: "1px solid var(--line)" }}>
-      <h2 className="display recently-viewed-heading" style={{ fontSize: 24, marginBottom: 24 }}>
-        {t.recently_viewed}
-      </h2>
-      <div className="recently-viewed-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 24 }}>
+    <section className="recently-viewed-section" style={{ marginTop: 60, paddingTop: 40, borderTop: "1px solid var(--line)" }}>
+      <div className="container">
+        <h2 className="display" style={{ fontSize: 24, marginBottom: 24 }}>
+          {t.recently_viewed}
+        </h2>
+      </div>
+      <div
+        className="recently-viewed-row"
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 20,
+          overflowX: "auto",
+          overflowY: "visible",
+          paddingLeft: "max(24px, calc((100vw - 1280px) / 2))",
+          paddingRight: "max(24px, calc((100vw - 1280px) / 2))",
+          paddingBottom: 8,
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
         {items.map(({ item, category }) => (
-          <window.PropertyCard
-            key={item.id}
-            item={item}
-            t={t}
-            category={category}
-            onClick={() => go({ screen: "detail", category, id: item.id })}
-          />
+          <div key={item.id} style={{ flex: "0 0 260px", minWidth: 260, maxWidth: 260 }}>
+            <window.PropertyCard
+              item={item}
+              t={t}
+              category={category}
+              onClick={() => go({ screen: "detail", category, id: item.id })}
+            />
+          </div>
         ))}
       </div>
     </section>

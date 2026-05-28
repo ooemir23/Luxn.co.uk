@@ -812,3 +812,26 @@ input.text-input:focus, select.text-input:focus {
 .fade-in { animation: fadeIn 400ms ease both; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .no-scroll { overflow: hidden; }
+
+/* ============ RECENTLY VIEWED ============ */
+.recently-viewed-row {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.recently-viewed-row::-webkit-scrollbar { display: none; }
+.recently-viewed-row > div {
+  flex: 0 0 260px;
+  min-width: 260px;
+  max-width: 260px;
+}
+/* card inside the strip fills its wrapper */
+.recently-viewed-row .property-card,
+.recently-viewed-row [class*="card"] {
+  width: 100%;
+  min-width: 0;
+}
