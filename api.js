@@ -2,11 +2,8 @@
 // Browser → proxy.php (PHP server) → TalorData (CORS-safe)
 // Deploy proxy.php to your server and set PROXY_URL accordingly.
 
-// DEV:  node proxy.js  → http://localhost:8000
-// PROD: https://luxn.co.uk/proxy.php  (PHP) or Node server
-const PROXY_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "http://localhost:8000"
-  : "https://luxn.co.uk/proxy.php";
+// Uses unified Node.js proxy endpoint
+const PROXY_URL = `${window.location.protocol}//${window.location.host}/proxy`;
 
 const TALORDATA_KEY = "d3f0553493deb4ae2ad3d49f5d0eb4d3";
 const TALORDATA_URL = "https://serpapi.talordata.net/serp/v1/request";

@@ -1,0 +1,19 @@
+{
+  "name": "luxn-travel-platform",
+  "version": "1.0.0",
+  "description": "LUXN luxury travel platform",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["luxury", "travel", "bookings"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  }
+}
