@@ -37,7 +37,7 @@ function SmartImage({ src, alt, tone = 1, label, className = "", style }) {
 function Logo({ onClick }) {
   return (
     <div className="logo" onClick={onClick}>
-      LUXN<span className="dot"></span><span style={{ fontSize: "0.7em", letterSpacing: "0.12em", opacity: 0.7 }}>CO.UK</span>
+      Luxn<span style={{ fontSize: "0.85em", opacity: 0.8, letterSpacing: "0.02em", fontWeight: 300 }}>.co.uk</span>
     </div>);
 
 }

@@ -116,8 +116,7 @@ function SignInModal({ open, onClose, t }) {
         <button className="auth-close" onClick={onClose} aria-label="Close">×</button>
 
         <div className="auth-brand">
-          <span className="auth-logo">LUXN<span className="auth-logo-dot"></span></span>
-          <span className="auth-logo-sub mono">CO.UK</span>
+          <span className="auth-logo">Luxn<span style={{ fontSize: "0.8em", opacity: 0.8, letterSpacing: "0.02em" }}>.co.uk</span></span>
         </div>
 
         <h2 id="auth-title" className="auth-title display">

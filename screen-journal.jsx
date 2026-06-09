@@ -23,7 +23,7 @@ function JournalScreen({ t, lang, go, articleId }) {
       <main className="journal-screen">
         <section className="container journal-detail-hero">
           <div className="breadcrumb">
-            <button onClick={() => go({ screen: "home" })}>LUXN</button>
+            <button onClick={() => go({ screen: "home" })}>Luxn</button>
             <span className="sep">/</span>
             <button onClick={handleBack}>{t.journal.title}</button>
             <span className="sep">/</span>
@@ -122,7 +122,7 @@ function JournalScreen({ t, lang, go, articleId }) {
       <section className="journal-head">
         <div className="container">
           <div className="breadcrumb">
-            <button onClick={() => go({ screen: "home" })}>LUXN</button>
+            <button onClick={() => go({ screen: "home" })}>Luxn</button>
             <span className="sep">/</span>
             <span className="here">{t.journal.title}</span>
           </div>

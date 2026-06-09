@@ -44,7 +44,7 @@ function BookingScreen({ t, lang, category, id, go }) {
     <main>
       <section className="container detail-hero">
         <div className="breadcrumb">
-          <button onClick={() => go({ screen: "home" })}>LUXN</button>
+          <button onClick={() => go({ screen: "home" })}>Luxn</button>
           <span className="sep">/</span>
           <button onClick={() => go({ screen: "results", category })}>{t.nav[category]}</button>
           <span className="sep">/</span>

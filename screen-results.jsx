@@ -116,7 +116,7 @@ function ResultsScreen({ t, lang, category, setCategory, go, searchParams }) {
         <div className="container results-head-inner">
           <div>
             <div className="breadcrumb">
-              <button onClick={() => go({ screen: "home" })}>LUXN</button>
+              <button onClick={() => go({ screen: "home" })}>Luxn</button>
               <span className="sep">/</span>
               <span className="here">{t.nav[category]}</span>
             </div>

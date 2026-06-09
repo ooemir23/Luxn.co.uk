@@ -109,7 +109,7 @@ function ConciergeScreen({ t, lang, go }) {
     <main className="concierge-screen-wrap">
       <section className="container concierge-screen">
         <div className="breadcrumb">
-          <button onClick={() => go({ screen: "home" })}>LUXN</button>
+          <button onClick={() => go({ screen: "home" })}>Luxn</button>
           <span className="sep">/</span>
           <span className="here">{t.nav.concierge}</span>
         </div>

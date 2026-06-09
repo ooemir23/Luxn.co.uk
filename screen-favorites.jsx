@@ -13,7 +13,7 @@ function FavoritesScreen({ t, lang, go }) {
       <section className="favorites-head">
         <div className="container">
           <div className="breadcrumb">
-            <button onClick={() => go({ screen: "home" })}>LUXN</button>
+            <button onClick={() => go({ screen: "home" })}>Luxn</button>
             <span className="sep">/</span>
             <span className="here">{t.nav.favorites}</span>
           </div>

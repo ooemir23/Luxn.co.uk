@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3000;
 const TALORDATA_KEY = 'd3f0553493deb4ae2ad3d49f5d0eb4d3';
 const TALORDATA_URL = 'https://serpapi.talordata.net/serp/v1/request';
 

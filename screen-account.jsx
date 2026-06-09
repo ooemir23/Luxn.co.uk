@@ -33,7 +33,7 @@ function AccountScreen({ t, lang, go }) {
       <section className="account-head">
         <div className="container">
           <div className="breadcrumb">
-            <button onClick={() => go({ screen: "home" })}>LUXN</button>
+            <button onClick={() => go({ screen: "home" })}>Luxn</button>
             <span className="sep">/</span>
             <span className="here">{t.account.title}</span>
           </div>
