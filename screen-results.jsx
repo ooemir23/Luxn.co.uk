@@ -4,7 +4,7 @@ function ResultsScreen({ t, lang, category, setCategory, go, searchParams }) {
   const dataByCat = { stay: window.STAYS, drive: window.CARS, sail: window.YACHTS };
   const amenByCat = { stay: window.AMENITIES_STAY, drive: window.AMENITIES_CAR, sail: window.AMENITIES_YACHT };
 
-  // Live API results for "stay" if searchParams present, else fall back
+  // Live API results for "stay" from Otelz if searchParams present, else fall back
   const [liveResults, setLiveResults] = React.useState(null);
   const [apiState, setApiState] = React.useState("idle");
 
@@ -14,27 +14,40 @@ function ResultsScreen({ t, lang, category, setCategory, go, searchParams }) {
       setApiState("idle");
       return;
     }
+
     setApiState("loading");
     const ctrl = new AbortController();
-    const params = searchParams && searchParams.dest
-      ? {
-          dest_id: searchParams.dest.dest_id,
-          search_type: searchParams.dest.search_type,
-          arrival_date: searchParams.checkIn,
-          departure_date: searchParams.checkOut,
-          adults: searchParams.adults,
-          rooms: searchParams.rooms,
-          signal: ctrl.signal,
+
+    // Use searchParams if available, otherwise use defaults
+    const destination = searchParams?.dest?.label || "Paris";
+    const checkIn = searchParams?.checkIn || new Date().toISOString().split('T')[0];
+    const checkOut = searchParams?.checkOut || new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
+    const guests = searchParams?.adults || 2;
+    const rooms = searchParams?.rooms || 1;
+
+    if (window.otelz?.searchHotels) {
+      window.otelz.searchHotels({
+        destination,
+        checkIn,
+        checkOut,
+        guests,
+        rooms,
+        signal: ctrl.signal
+      }).then(data => {
+        if (data && data.length > 0) {
+          setLiveResults(data);
+          setApiState("live");
+        } else {
+          setApiState("mock");
         }
-      : { dest_id: "-1456928", search_type: "city", signal: ctrl.signal };
-    window.fetchHotelsByDest(params).then(data => {
-      if (data && data.length) {
-        setLiveResults(data);
-        setApiState("live");
-      } else {
+      }).catch(err => {
+        console.warn('[LUXN] Results fetch error:', err.message);
         setApiState("mock");
-      }
-    });
+      });
+    } else {
+      setApiState("mock");
+    }
+
     return () => ctrl.abort();
   }, [category, searchParams]);
 

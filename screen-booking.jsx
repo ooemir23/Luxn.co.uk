@@ -1,4 +1,5 @@
 // LUXN — Booking flow (4 steps)
+// Submits reservation to Otelz API
 
 function BookingScreen({ t, lang, category, id, go }) {
   const dataByCat = { stay: window.STAYS, drive: window.CARS, sail: window.YACHTS };
@@ -9,10 +10,13 @@ function BookingScreen({ t, lang, category, id, go }) {
     notes: "",
     cardName: "", cardNum: "", exp: "", cvc: "",
   });
+  const [submitting, setSubmitting] = React.useState(false);
+  const [errorMsg, setErrorMsg] = React.useState(null);
+  const [confirmCode, setConfirmCode] = React.useState(null);
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
   const perLabel = category === "sail" ? t.results.per_week : category === "drive" ? t.results.per_day : t.results.per_night;
-  
+
   // Read active booking details from localStorage
   const activeBooking = React.useMemo(() => {
     try {
@@ -37,8 +41,6 @@ function BookingScreen({ t, lang, category, id, go }) {
   const subtotal = item.price * nights;
   const fee = Math.round(subtotal * 0.04);
   const total = subtotal + fee;
-
-  const code = React.useMemo(() => "LUX-" + Math.random().toString(36).slice(2, 8).toUpperCase(), []);
 
   return (
     <main>
@@ -171,10 +173,17 @@ function BookingScreen({ t, lang, category, id, go }) {
               <div className="confirm-mark">✓</div>
               <h2 className="confirm-title">{t.booking.confirmed_title}</h2>
               <p className="confirm-sub">{t.booking.confirmed_sub}</p>
-              <div className="confirm-code">
-                <span className="label">{t.booking.confirmation}</span>
-                {code}
-              </div>
+              {confirmCode && (
+                <div className="confirm-code">
+                  <span className="label">{t.booking.confirmation}</span>
+                  {confirmCode}
+                </div>
+              )}
+              {errorMsg && (
+                <div style={{ marginTop: 20, padding: 16, background: "var(--error-bg, #fee)", borderRadius: "var(--radius)", color: "var(--error, #c00)", fontSize: 14 }}>
+                  {errorMsg}
+                </div>
+              )}
               <div style={{ marginTop: 40 }}>
                 <button className="btn" onClick={() => go({ screen: "home" })}>{t.booking.done}</button>
               </div>
@@ -190,30 +199,81 @@ function BookingScreen({ t, lang, category, id, go }) {
               )}
               <button
                 className="btn btn-accent"
-                onClick={() => {
+                disabled={submitting}
+                onClick={async () => {
                   if (step === 2) {
-                    const currentBookings = [];
+                    // Validate required fields
+                    if (!form.email) {
+                      setErrorMsg(lang === "tr" ? "E-posta adresi gerekli" : "Email is required");
+                      return;
+                    }
+                    if (!form.first || !form.last) {
+                      setErrorMsg(lang === "tr" ? "Ad ve soyad gerekli" : "First and last name are required");
+                      return;
+                    }
+
+                    setSubmitting(true);
+                    setErrorMsg(null);
+
                     try {
-                      const raw = localStorage.getItem("luxn.bookings.v1");
-                      if (raw) currentBookings.push(...JSON.parse(raw));
-                    } catch (e) {}
+                      // Call Otelz API
+                      const response = await window.otelz?.createReservation({
+                        hotelId: item.rawId || item.id,
+                        roomTypeId: "standard",
+                        guestInfo: {
+                          firstName: form.first,
+                          lastName: form.last,
+                          email: form.email,
+                          phone: form.phone,
+                          notes: form.notes
+                        },
+                        checkIn: checkInISO,
+                        checkOut: checkOutISO,
+                        guests,
+                        totalPrice: total,
+                        currency: item.currency || "EUR"
+                      });
 
-                    const newBooking = {
-                      code,
-                      item: { id: item.id, name: item.name, loc: item.loc, price: item.price, currency: item.currency, tone: item.tone },
-                      category,
-                      dates: `${formatBookingDate(checkInISO, "-")} – ${formatBookingDate(checkOutISO, "-")}`,
-                      total,
-                      createdAt: Date.now()
-                    };
+                      if (response?.confirmationCode) {
+                        setConfirmCode(response.confirmationCode);
 
-                    currentBookings.unshift(newBooking);
-                    localStorage.setItem("luxn.bookings.v1", JSON.stringify(currentBookings));
+                        // Also save to localStorage for backup
+                        const currentBookings = [];
+                        try {
+                          const raw = localStorage.getItem("luxn.bookings.v1");
+                          if (raw) currentBookings.push(...JSON.parse(raw));
+                        } catch (e) {}
+
+                        const newBooking = {
+                          code: response.confirmationCode,
+                          item: { id: item.id, name: item.name, loc: item.loc, price: item.price, currency: item.currency, tone: item.tone },
+                          category,
+                          dates: `${formatBookingDate(checkInISO, "-")} – ${formatBookingDate(checkOutISO, "-")}`,
+                          total,
+                          reservationId: response.reservationId,
+                          createdAt: new Date(response.createdAt || Date.now()).getTime()
+                        };
+
+                        currentBookings.unshift(newBooking);
+                        localStorage.setItem("luxn.bookings.v1", JSON.stringify(currentBookings));
+                      } else {
+                        throw new Error(lang === "tr" ? "Onay kodu alınamadı" : "No confirmation code received");
+                      }
+
+                      setStep(step + 1);
+                    } catch (err) {
+                      const msg = err.message || (lang === "tr" ? "Rezervasyon başarısız oldu" : "Reservation failed");
+                      setErrorMsg(msg);
+                      console.error('[LUXN booking] Error:', err);
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  } else {
+                    setStep(step + 1);
                   }
-                  setStep(step + 1);
                 }}
               >
-                {step === 2 ? t.booking.confirm : t.booking.continue} →
+                {submitting ? "..." : (step === 2 ? t.booking.confirm : t.booking.continue)} →
               </button>
             </div>
           ) : null}

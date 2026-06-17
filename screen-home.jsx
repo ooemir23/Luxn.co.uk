@@ -1,22 +1,47 @@
 // LUXN — Compact home screen (magazine layout, minimal scroll)
+// Uses Otelz API for live hotel data
 
 function HomeScreen({ t, lang, category, setCategory, go }) {
-  // Live hotel data from Booking.com API (gracefully falls back to mock)
+  // Live hotel data from Otelz API (gracefully falls back to mock)
   const [liveStays, setLiveStays] = React.useState(null);
   const [apiState, setApiState] = React.useState("loading"); // loading | live | mock
 
   React.useEffect(() => {
     let cancelled = false;
     const ctrl = new AbortController();
-    window.fetchHotels({ destIdx: 0, signal: ctrl.signal }).then(data => {
-      if (cancelled) return;
-      if (data && data.length) {
-        setLiveStays(data);
-        setApiState("live");
-      } else {
-        setApiState("mock");
-      }
-    });
+
+    // Fetch featured hotels from Otelz (default: Paris)
+    const checkIn = new Date();
+    checkIn.setDate(checkIn.getDate() + 14); // 2 weeks from now
+    const checkOut = new Date(checkIn);
+    checkOut.setDate(checkOut.getDate() + 7); // 7-night stay
+
+    if (window.otelz?.searchHotels) {
+      window.otelz.searchHotels({
+        destination: "Paris",
+        checkIn: checkIn.toISOString().split('T')[0],
+        checkOut: checkOut.toISOString().split('T')[0],
+        guests: 2,
+        rooms: 1,
+        signal: ctrl.signal
+      }).then(data => {
+        if (cancelled) return;
+        if (data && data.length > 0) {
+          setLiveStays(data);
+          setApiState("live");
+        } else {
+          setApiState("mock");
+        }
+      }).catch(err => {
+        if (!cancelled) {
+          console.warn('[LUXN] Home fetch error:', err.message);
+          setApiState("mock");
+        }
+      });
+    } else {
+      setApiState("mock");
+    }
+
     return () => { cancelled = true; ctrl.abort(); };
   }, []);
 
