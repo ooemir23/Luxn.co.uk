@@ -292,15 +292,72 @@ function DetailScreen({ t, lang, category, id, go }) {
           </div>
         </div>
 
-        <div className="detail-gallery-new">
-          <div className="gallery-main">
-            <SmartImage src={window.imageFor(item, category)} alt={item.name} tone={item.tone} label={`${item.name.toUpperCase()} · 01`} />
+        {/* Gallery + Booking Card Side-by-side */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: "32px", alignItems: "start", marginTop: 32 }}>
+          <div className="detail-gallery-new">
+            <div className="gallery-main">
+              <SmartImage src={window.imageFor(item, category)} alt={item.name} tone={item.tone} label={`${item.name.toUpperCase()} · 01`} />
+            </div>
+            <div className="gallery-sides">
+              <div className="side-img"><SmartImage src={window.imageFor(item, category)} tone={(item.tone % 7) + 1} label="02" /></div>
+              <div className="side-img"><SmartImage src={window.imageFor(item, category)} tone={((item.tone + 2) % 7) + 1} label="03" /></div>
+              <div className="side-img"><SmartImage src={window.imageFor(item, category)} tone={((item.tone + 3) % 7) + 1} label="04" /></div>
+              <div className="side-img"><SmartImage src={window.imageFor(item, category)} tone={((item.tone + 4) % 7) + 1} label="05" /></div>
+            </div>
           </div>
-          <div className="gallery-sides">
-            <div className="side-img"><SmartImage src={window.imageFor(item, category)} tone={(item.tone % 7) + 1} label="02" /></div>
-            <div className="side-img"><SmartImage src={window.imageFor(item, category)} tone={((item.tone + 2) % 7) + 1} label="03" /></div>
-            <div className="side-img"><SmartImage src={window.imageFor(item, category)} tone={((item.tone + 3) % 7) + 1} label="04" /></div>
-            <div className="side-img"><SmartImage src={window.imageFor(item, category)} tone={((item.tone + 4) % 7) + 1} label="05" /></div>
+
+          {/* Booking Card Moved Here */}
+          <div style={{ background: "var(--bg-secondary)", padding: 24, borderRadius: "var(--radius)", border: "1px solid var(--line)" }}>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: "28px", fontWeight: "600", marginBottom: 4 }}>
+                {window.otelz?.getCurrencySymbol ? window.otelz.getCurrencySymbol(item.currency || "EUR") : item.currency}{item.price}
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--ink-2)" }}>per night</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: "12px", color: "var(--ink-2)" }}>
+              <span>★ {item.rating.toFixed(2)}</span>
+              <span>·</span>
+              <span>{Math.round(item.rating * 47)} {lang === "tr" ? "yorumlar" : "reviews"}</span>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: "11px", textTransform: "uppercase", color: "var(--ink-3)", display: "block", marginBottom: 6 }}>CHECK-IN</label>
+              <input type="date" value={checkIn} onChange={e => setCheckIn(e.target.value)} style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--line)", borderRadius: "var(--radius)", fontSize: "14px" }} />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: "11px", textTransform: "uppercase", color: "var(--ink-3)", display: "block", marginBottom: 6 }}>CHECK-OUT</label>
+              <input type="date" value={checkOut} onChange={e => setCheckOut(e.target.value)} style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--line)", borderRadius: "var(--radius)", fontSize: "14px" }} />
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: "11px", textTransform: "uppercase", color: "var(--ink-3)", display: "block", marginBottom: 6 }}>GUESTS</label>
+              <select value={guests} onChange={e => setGuests(Number(e.target.value))} style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--line)", borderRadius: "var(--radius)", fontSize: "14px" }}>
+                <option value="1">1 {lang === "tr" ? "kişi" : "guest"}</option>
+                <option value="2">2 {lang === "tr" ? "yetişkin" : "adults"}</option>
+                <option value="3">3 {lang === "tr" ? "yetişkin" : "adults"}</option>
+                <option value="4">4+ {lang === "tr" ? "yetişkin" : "adults"}</option>
+              </select>
+            </div>
+            <button className="btn btn-accent" style={{ width: "100%", marginBottom: 12, padding: "12px", borderRadius: "var(--radius)" }} onClick={() => go({ screen: "booking", category, id: item.id })}>
+              {lang === "tr" ? "Rezervasyon Yap" : "Reserve"}
+            </button>
+            <button className="btn btn-ghost" style={{ width: "100%", padding: "12px", borderRadius: "var(--radius)" }} onClick={() => go({ screen: "concierge" })}>
+              {lang === "tr" ? "Concierge ile Konuş" : "Speak to a concierge"}
+            </button>
+            {nights > 0 && (
+              <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)", fontSize: "12px", color: "var(--ink-2)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span>{item.price} × {nights} {lang === "tr" ? "gece" : "nights"}</span>
+                  <span>{item.currency}{(item.price * nights).toLocaleString()}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+                  <span>{lang === "tr" ? "Concierge ücreti" : "Concierge fee"} (4%)</span>
+                  <span>{item.currency}{Math.round(item.price * nights * 0.04).toLocaleString()}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "600" }}>
+                  <span>{lang === "tr" ? "Toplam" : "Total"}</span>
+                  <span>{item.currency}{(item.price * nights + Math.round(item.price * nights * 0.04)).toLocaleString()}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -497,7 +554,7 @@ function DetailScreen({ t, lang, category, id, go }) {
           </div>
         </div>
 
-        <aside className="sticky-booking-aside">
+        <aside className="sticky-booking-aside" style={{ display: "none" }}>
           <div className="booking-card-inner">
             <div className="aside-price-header">
               <span className="price-val">{window.formatPrice ? window.formatPrice(item.price, item.currency) : `${item.currency}${item.price.toLocaleString()}`}</span>
