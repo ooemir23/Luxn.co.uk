@@ -38,8 +38,7 @@ async function otelzRequest(endpoint, body = {}, signal) {
         endpoint,
         ...body
       }),
-      signal,
-      timeout: 10000
+      signal
     });
 
     if (!response.ok) {

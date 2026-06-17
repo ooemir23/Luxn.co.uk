@@ -340,10 +340,19 @@ function SearchBar({ t, lang, category, setCategory, onSearch, compact = false, 
   };
 
   const handleSearch = () => {
+    // Validate required fields
+    if (!checkIn || !checkOut) {
+      alert(lang === "tr" ? "Lütfen tarih seçin" : "Please select dates");
+      return;
+    }
+    if (!where) {
+      alert(lang === "tr" ? "Lütfen hedef seçin" : "Please select destination");
+      return;
+    }
+
     onSearch && onSearch({
       category,
-      dest,
-      whereLabel: where,
+      dest: dest || { label: where },  // Fallback to where if dest not fully resolved
       checkIn,
       checkOut,
       adults,

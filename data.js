@@ -314,4 +314,66 @@ function getItemAmenities(id, category) {
   return subset.length > 0 ? subset : all.slice(0, 3);
 }
 
-Object.assign(window, { I18N, STAYS, CARS, YACHTS, JOURNAL, JOURNAL_DETAILS, AMENITIES_STAY, AMENITIES_CAR, AMENITIES_YACHT, getItemAmenities });
+// Search destinations (mock implementation)
+function searchDestinations(query, { signal } = {}) {
+  const allDests = [
+    { dest_id: "1", label: "Paris", country: "France" },
+    { dest_id: "2", label: "Rome", country: "Italy" },
+    { dest_id: "3", label: "Mykonos", country: "Greece" },
+    { dest_id: "4", label: "Marrakech", country: "Morocco" },
+    { dest_id: "5", label: "Kyoto", country: "Japan" },
+    { dest_id: "6", label: "Bali", country: "Indonesia" },
+    { dest_id: "7", label: "Istanbul", country: "Turkey" },
+    { dest_id: "8", label: "Barcelona", country: "Spain" },
+    { dest_id: "9", label: "Amsterdam", country: "Netherlands" },
+    { dest_id: "10", label: "Vienna", country: "Austria" }
+  ];
+
+  const q = query.toLowerCase();
+  const filtered = allDests.filter(d =>
+    d.label.toLowerCase().includes(q) ||
+    d.country.toLowerCase().includes(q)
+  );
+
+  return Promise.resolve(filtered.slice(0, 5));
+}
+
+// Image URL provider for items
+function imageFor(item, category) {
+  if (!item) return null;
+  if (item.image) return item.image;
+
+  // Fallback: use placeholder images
+  const id = item.id || item.rawId || "default";
+  const width = 640;
+  const height = 480;
+
+  // Use picsum.photos for consistent placeholder images
+  const imageMap = {
+    s1: `https://picsum.photos/${width}/${height}?random=1`,
+    s2: `https://picsum.photos/${width}/${height}?random=2`,
+    s3: `https://picsum.photos/${width}/${height}?random=3`,
+    s4: `https://picsum.photos/${width}/${height}?random=4`,
+    s5: `https://picsum.photos/${width}/${height}?random=5`,
+    s6: `https://picsum.photos/${width}/${height}?random=6`,
+    c1: `https://picsum.photos/${width}/${height}?random=7`,
+    c2: `https://picsum.photos/${width}/${height}?random=8`,
+    c3: `https://picsum.photos/${width}/${height}?random=9`,
+    c4: `https://picsum.photos/${width}/${height}?random=10`,
+    c5: `https://picsum.photos/${width}/${height}?random=11`,
+    c6: `https://picsum.photos/${width}/${height}?random=12`,
+    y1: `https://picsum.photos/${width}/${height}?random=13`,
+    y2: `https://picsum.photos/${width}/${height}?random=14`,
+    y3: `https://picsum.photos/${width}/${height}?random=15`,
+    y4: `https://picsum.photos/${width}/${height}?random=16`,
+    y5: `https://picsum.photos/${width}/${height}?random=17`,
+    y6: `https://picsum.photos/${width}/${height}?random=18`,
+    j1: `https://picsum.photos/${width}/${height}?random=19`,
+    j2: `https://picsum.photos/${width}/${height}?random=20`,
+    j3: `https://picsum.photos/${width}/${height}?random=21`,
+  };
+
+  return imageMap[id] || `https://picsum.photos/${width}/${height}?random=${Math.random()}`;
+}
+
+Object.assign(window, { I18N, STAYS, CARS, YACHTS, JOURNAL, JOURNAL_DETAILS, AMENITIES_STAY, AMENITIES_CAR, AMENITIES_YACHT, getItemAmenities, imageFor, searchDestinations });

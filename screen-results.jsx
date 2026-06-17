@@ -7,44 +7,60 @@ function ResultsScreen({ t, lang, category, setCategory, go, searchParams }) {
   // Live API results for "stay" from Otelz if searchParams present, else fall back
   const [liveResults, setLiveResults] = React.useState(null);
   const [apiState, setApiState] = React.useState("idle");
+  const [searchError, setSearchError] = React.useState(null);
 
   React.useEffect(() => {
     if (category !== "stay") {
+      setLiveResults(null);
+      setApiState("idle");
+      setSearchError(null);
+      return;
+    }
+
+    // Check if we have search params
+    if (!searchParams || !searchParams.checkIn || !searchParams.checkOut) {
       setLiveResults(null);
       setApiState("idle");
       return;
     }
 
     setApiState("loading");
+    setSearchError(null);
     const ctrl = new AbortController();
 
-    // Use searchParams if available, otherwise use defaults
-    const destination = searchParams?.dest?.label || "Paris";
-    const checkIn = searchParams?.checkIn || new Date().toISOString().split('T')[0];
-    const checkOut = searchParams?.checkOut || new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
-    const guests = searchParams?.adults || 2;
-    const rooms = searchParams?.rooms || 1;
+    // Extract Otelz-compatible params from searchParams
+    const destination = searchParams.dest?.label || searchParams.dest?.name || "Paris";
+    const checkIn = searchParams.checkIn;  // Should be ISO format YYYY-MM-DD
+    const checkOut = searchParams.checkOut; // Should be ISO format YYYY-MM-DD
+    const adults = searchParams.adults || 2;
+    const rooms = searchParams.rooms || 1;
+
+    console.log('[LUXN] Searching Otelz:', { destination, checkIn, checkOut, adults, rooms });
 
     if (window.otelz?.searchHotels) {
       window.otelz.searchHotels({
         destination,
         checkIn,
         checkOut,
-        guests,
+        guests: adults,
         rooms,
         signal: ctrl.signal
       }).then(data => {
         if (data && data.length > 0) {
+          console.log('[LUXN] Got', data.length, 'hotels from Otelz');
           setLiveResults(data);
           setApiState("live");
         } else {
+          console.warn('[LUXN] No results from Otelz, using mock data');
           setApiState("mock");
         }
       }).catch(err => {
-        console.warn('[LUXN] Results fetch error:', err.message);
+        console.error('[LUXN] Otelz search error:', err.message);
+        setSearchError(err.message);
         setApiState("mock");
       });
     } else {
+      console.warn('[LUXN] otelz.searchHotels not available');
       setApiState("mock");
     }
 
