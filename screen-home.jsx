@@ -47,27 +47,13 @@ function HomeScreen({ t, lang, category, setCategory, go }) {
 
   const stays = liveStays || window.STAYS;
 
-  // Active tab: 'edit' (curated mix) | 'stay' | 'drive'
-  const [tab, setTab] = React.useState("edit");
+  // Active tab: 'stay' only (Otelz integration)
+  const [tab, setTab] = React.useState("stay");
 
-  // Build display list for the grid: featured + 4 sides
-  // Curated mix: 1 stay big + 1 drive + 1 stay + 1 drive
-  const mix = React.useMemo(() => {
-    return [
-      { item: stays[0], cat: "stay" },
-      { item: window.CARS[0], cat: "drive" },
-      { item: stays[1], cat: "stay" },
-      { item: window.CARS[1], cat: "drive" },
-      { item: stays[2], cat: "stay" },
-      { item: window.CARS[2], cat: "drive" },
-    ];
-  }, [stays]);
-
+  // Display stays only
   const filteredItems = React.useMemo(() => {
-    if (tab === "edit") return mix;
-    const src = tab === "stay" ? stays : window.CARS;
-    return src.slice(0, 8).map(item => ({ item, cat: tab }));
-  }, [tab, stays, mix]);
+    return stays.slice(0, 8).map(item => ({ item, cat: "stay" }));
+  }, [stays]);
 
   const featured = filteredItems[0];
   const sides = filteredItems.slice(1, 5);
@@ -119,26 +105,18 @@ function HomeScreen({ t, lang, category, setCategory, go }) {
         </div>
       </section>
 
-      {/* TAB STRIP */}
+      {/* OTELZ FEATURED STAYS */}
       <section className="home-tabs">
         <div className="container tabs-inner">
-          <div className="tabs-list">
-            <button className={`home-tab ${tab === "edit" ? "active" : ""}`} onClick={() => setTab("edit")}>
-              <span className="tab-num mono">01</span>
-              <span className="tab-lbl">{lang === "tr" ? "Bu haftanın seçkisi" : "This week's edit"}</span>
-            </button>
-            <button className={`home-tab ${tab === "stay" ? "active" : ""}`} onClick={() => setTab("stay")}>
-              <span className="tab-num mono">02</span>
-              <span className="tab-lbl">{t.nav.stay}</span>
-            </button>
-            <button className={`home-tab ${tab === "drive" ? "active" : ""}`} onClick={() => setTab("drive")}>
-              <span className="tab-num mono">03</span>
-              <span className="tab-lbl">{t.nav.drive}</span>
-            </button>
+          <div style={{ flex: 1 }}>
+            <h2 className="detail-title" style={{ marginBottom: 0, fontSize: "1.5rem" }}>
+              {t.home.stay_title}
+            </h2>
+            <p style={{ color: "var(--ink-2)", marginTop: 8 }}>{t.home.stay_sub}</p>
           </div>
           <button
             className="tabs-cta"
-            onClick={() => go({ screen: "results", category: tab === "edit" ? "stay" : tab })}
+            onClick={() => go({ screen: "results", category: "stay" })}
           >
             {t.home.view_all} →
           </button>

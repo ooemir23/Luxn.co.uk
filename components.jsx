@@ -54,7 +54,6 @@ function Nav({ t, lang, setLang, active, go, theme, dark, setDark, onSignInClick
         <Logo onClick={() => { go({ screen: "home" }); closeMenu(); }} />
         <nav className="nav-links" aria-label="primary">
           <button className={`nav-link ${active === "stay" ? "active" : ""}`} onClick={() => go({ screen: "results", category: "stay" })}>{t.nav.stay}</button>
-          <button className={`nav-link ${active === "drive" ? "active" : ""}`} onClick={() => go({ screen: "results", category: "drive" })}>{t.nav.drive}</button>
           <GlobalSearch t={t} lang={lang} go={go} />
           <button className={`nav-link ${active === "journal" ? "active" : ""}`} onClick={() => go({ screen: "journal" })}>{t.nav.journal}</button>
           <button className={`nav-link ${active === "concierge" ? "active" : ""}`} onClick={() => go({ screen: "concierge" })}>{t.nav.concierge}</button>
@@ -268,10 +267,9 @@ function GlobalSearch({ t, lang, go }) {
 }
 
 // ============ SEARCH BAR (functional) ============
-function SearchBar({ t, lang, category, setCategory, onSearch, compact = false, initial = {} }) {
-  const tabs = [
-  { id: "stay", label: t.search.tabs.stay },
-  { id: "drive", label: t.search.tabs.drive }];
+function SearchBar({ t, lang, category = "stay", setCategory, onSearch, compact = false, initial = {} }) {
+  // Otelz integration: Stay only
+  const category_stay = "stay";
 
 
   const [where, setWhere] = useState(initial.whereLabel || "");
@@ -361,22 +359,11 @@ function SearchBar({ t, lang, category, setCategory, onSearch, compact = false, 
     setOpenField(null);
   };
 
-  const cityFieldLabel = category === "drive" ? t.search.pickup : t.search.destination;
-  const cityFieldPh = category === "drive" ? t.search.pickup_ph : t.search.destination_ph;
+  const cityFieldLabel = t.search.destination;
+  const cityFieldPh = t.search.destination_ph;
 
   return (
     <div className={`search-bar ${compact ? "compact" : ""}`} ref={wrapRef}>
-      <div className="search-tabs">
-        {tabs.map((tab) =>
-        <button
-          key={tab.id}
-          className={`search-tab ${category === tab.id ? "active" : ""}`}
-          onClick={() => setCategory(tab.id)}>
-          
-            {tab.label}
-          </button>
-        )}
-      </div>
       <div className="search-fields">
         {/* WHERE */}
         <div className="search-field-wrap">

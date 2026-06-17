@@ -103,10 +103,64 @@ function DetailScreen({ t, lang, category, id, go }) {
   const item = dataByCat[category].find(i => i.id === id) || dataByCat[category][0];
   const [tab, setTab] = React.useState("overview");
 
+  // Otelz API data
+  const [hotelDetails, setHotelDetails] = React.useState(null);
+  const [hotelRates, setHotelRates] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
+
   // Booking details state
   const [checkIn, setCheckIn] = React.useState("");
   const [checkOut, setCheckOut] = React.useState("");
   const [guests, setGuests] = React.useState(2);
+
+  // Fetch hotel details & rates from Otelz
+  React.useEffect(() => {
+    if (category !== "stay" || !item.rawId) return;
+
+    setLoading(true);
+    const ctrl = new AbortController();
+
+    // Get hotel details
+    if (window.otelz?.getHotelDetails) {
+      window.otelz.getHotelDetails({ hotelId: item.rawId, signal: ctrl.signal })
+        .then(details => {
+          if (details) setHotelDetails(details);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.warn('[LUXN] Hotel details error:', err.message);
+          setLoading(false);
+        });
+    }
+
+    return () => ctrl.abort();
+  }, [category, item.rawId]);
+
+  // Fetch rates when dates are set
+  React.useEffect(() => {
+    if (category !== "stay" || !item.rawId || !checkIn || !checkOut) return;
+
+    const ctrl = new AbortController();
+
+    if (window.otelz?.getHotelRates) {
+      window.otelz.getHotelRates({
+        hotelId: item.rawId,
+        checkIn,
+        checkOut,
+        guests,
+        rooms: 1,
+        signal: ctrl.signal
+      })
+        .then(rates => {
+          if (rates) setHotelRates(rates);
+        })
+        .catch(err => {
+          console.warn('[LUXN] Hotel rates error:', err.message);
+        });
+    }
+
+    return () => ctrl.abort();
+  }, [category, item.rawId, checkIn, checkOut, guests]);
 
   React.useEffect(() => {
     if (window.addRecentlyViewed) {
